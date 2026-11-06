@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifesos.local/contracts/rfid-verify-response.json",
+  "title": "RfidVerifyResponse",
+  "description": "POST /api/rfid/verify success body",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["staffId", "name", "role", "token"],
+  "properties": {
+    "staffId": { "type": "string" },
+    "name": { "type": "string" },
+    "role": {
+      "type": "string",
+      "enum": ["PHYSICIAN", "NURSE", "PARAMEDIC", "ADMIN"]
+    },
+    "token": {
+      "type": "string",
+      "description": "Short-lived staff token issued after card verification."
+    }
+  }
+}

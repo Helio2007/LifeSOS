@@ -1,0 +1,8 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifesos.local/contracts/emergency-status.json",
+  "title": "EmergencyStatus",
+  "description": "MVP lifecycle for a LifeSOS emergency case.",
+  "type": "string",
+  "enum": ["CREATED", "EN_ROUTE", "ARRIVED", "IN_TREATMENT", "COMPLETED"]
+}

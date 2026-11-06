@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifesos.local/contracts/rfid-verify-request.json",
+  "title": "RfidVerifyRequest",
+  "description": "POST /api/rfid/verify",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["uid"],
+  "properties": {
+    "uid": {
+      "type": "string",
+      "minLength": 4,
+      "description": "UID as reported by the USB reader (keyboard wedge, typically hex)."
+    }
+  }
+}

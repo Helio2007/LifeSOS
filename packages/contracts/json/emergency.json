@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifesos.local/contracts/emergency.json",
+  "title": "Emergency",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "status",
+    "createdAt",
+    "updatedAt",
+    "patient",
+    "symptoms",
+    "vitals",
+    "notes"
+  ],
+  "properties": {
+    "id": { "type": "string" },
+    "status": { "$ref": "./emergency-status.json" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" },
+    "ambulanceId": { "type": "string" },
+    "critical": { "type": "boolean" },
+    "symptoms": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "notes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/TreatmentNote" }
+    },
+    "patient": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "fullName", "age", "sex"],
+      "properties": {
+        "id": { "type": "string" },
+        "fullName": { "type": "string" },
+        "age": { "type": "integer", "minimum": 0 },
+        "sex": { "type": "string", "enum": ["M", "F", "X"] }
+      }
+    },
+    "vitals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "heartRateBpm",
+        "systolicMmhg",
+        "diastolicMmhg",
+        "spo2Percent",
+        "respiratoryRate",
+        "temperatureC",
+        "recordedAt"
+      ],
+      "properties": {
+        "heartRateBpm": { "type": "number" },
+        "systolicMmhg": { "type": "number" },
+        "diastolicMmhg": { "type": "number" },
+        "spo2Percent": { "type": "number" },
+        "respiratoryRate": { "type": "number" },
+        "temperatureC": { "type": "number" },
+        "recordedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "$defs": {
+    "TreatmentNote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text", "authorStaffId", "authorName", "createdAt"],
+      "properties": {
+        "id": { "type": "string" },
+        "text": { "type": "string" },
+        "authorStaffId": { "type": "string" },
+        "authorName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}
