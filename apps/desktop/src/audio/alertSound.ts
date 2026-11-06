@@ -8,7 +8,7 @@ function audio(): AudioContext {
   return ctx;
 }
 
-/** Call from a user gesture (login) so the Flash Alert siren can start later. */
+/** Call from a user gesture (RFID tap / simulate) so the Flash Alert siren can start later. */
 export async function unlockAudio(): Promise<void> {
   const ac = audio();
   if (ac.state === "suspended") {

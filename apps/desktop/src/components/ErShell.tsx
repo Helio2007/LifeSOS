@@ -1,25 +1,19 @@
 import { useEffect, useState } from "react";
 import { USE_MOCK } from "../api/client";
-import { useRfidWedge } from "../rfid/useRfidWedge";
 import { useEr } from "../state/ErSession";
 import { CaseDetail } from "./CaseDetail";
-import { FlashAlert } from "./FlashAlert";
 import { RfidPanel } from "./RfidPanel";
 
 export function ErShell() {
   const {
-    session,
+    staff,
     emergencies,
     selectedId,
     selected,
-    logout,
+    lockDesk,
     selectCase,
     simulateIncoming,
-    verifyRfid,
   } = useEr();
-  const { inputRef } = useRfidWedge((uid) => {
-    void verifyRfid(uid);
-  });
   const [clock, setClock] = useState(() => new Date());
 
   useEffect(() => {
@@ -29,14 +23,6 @@ export function ErShell() {
 
   return (
     <div className="shell">
-      <input
-        ref={inputRef}
-        className="rfid-hidden"
-        aria-label="RFID keyboard-wedge input"
-        autoComplete="off"
-        autoCorrect="off"
-        spellCheck={false}
-      />
       <header className="topbar">
         <div>
           <p className="eyebrow">LifeSOS</p>
@@ -45,12 +31,12 @@ export function ErShell() {
         <div className="topbar__meta">
           <span className="clock">{clock.toLocaleTimeString()}</span>
           <span className="pill">{USE_MOCK ? "Mock API" : "Spring Boot"}</span>
-          <span className="pill">{session?.displayName}</span>
+          <span className="pill">{staff?.name}</span>
           <button type="button" className="btn" onClick={() => void simulateIncoming()}>
             Simulate ambulance report
           </button>
-          <button type="button" className="btn btn--ghost" onClick={logout}>
-            Sign out
+          <button type="button" className="btn btn--ghost" onClick={lockDesk}>
+            Lock desk
           </button>
         </div>
       </header>
@@ -87,15 +73,14 @@ export function ErShell() {
           ) : (
             <div className="empty">
               <span className="empty__radar" />
-              <h2>Desk armed</h2>
-              <p>A mock `emergency.created` event will flash this screen.</p>
+              <h2>Desk unlocked</h2>
+              <p>Waiting for the next ambulance report.</p>
             </div>
           )}
         </main>
       </div>
 
       <RfidPanel />
-      <FlashAlert />
     </div>
   );
 }

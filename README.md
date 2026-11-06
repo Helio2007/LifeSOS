@@ -58,8 +58,6 @@ That starts the Vite/React UI at [http://127.0.0.1:5173](http://127.0.0.1:5173) 
 npm run desktop:electron
 ```
 
-Demo login: `er.staff` / `lifesos`
+Sign-in is RFID-only. Demo UIDs (type them and press Enter, or use the on-screen cards): `04A1B2C3` (physician), `04D4E5F6` (nurse). Mock verify returns staff identity, role, and session token.
 
-Demo RFID UIDs (type them and press Enter, or use the on-screen cards): `04A1B2C3` (physician), `04D4E5F6` (nurse).
-
-After login, a mock ambulance report is pushed on `emergency.created` (or click **Simulate ambulance report**).
+While the desk is locked, patient/case details are not shown. A mock ambulance report is pushed on `emergency.created` shortly after load (or click **Simulate ambulance report**): the Flash Alert names that a case arrived, but PHI appears only after RFID unlock. **Lock desk** hides the case screen again.

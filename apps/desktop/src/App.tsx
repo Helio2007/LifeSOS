@@ -1,10 +1,18 @@
-import { LoginScreen } from "./components/LoginScreen";
 import { ErShell } from "./components/ErShell";
+import { FlashAlert } from "./components/FlashAlert";
+import { LockScreen } from "./components/LockScreen";
+import { RfidCatcher } from "./components/RfidCatcher";
 import { ErProvider, useEr } from "./state/ErSession";
 
 function Gate() {
-  const { session } = useEr();
-  return session ? <ErShell /> : <LoginScreen />;
+  const { locked } = useEr();
+  return (
+    <>
+      <RfidCatcher />
+      {locked ? <LockScreen /> : <ErShell />}
+      <FlashAlert />
+    </>
+  );
 }
 
 export default function App() {

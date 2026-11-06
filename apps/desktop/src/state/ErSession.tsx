@@ -17,30 +17,19 @@ import { api } from "../api/client";
 import { ApiError } from "../mock/inProcessApi";
 import { playAlertSound, stopAlertSound, unlockAudio } from "../audio/alertSound";
 
-const SESSION_KEY = "lifesos.er.session";
-
-export interface DeskSession {
-  sessionToken: string;
-  displayName: string;
-  username: string;
-}
-
 interface ErContextValue {
-  session: DeskSession | null;
   staff: RfidVerifyResponse | null;
+  locked: boolean;
   emergencies: Emergency[];
   selectedId: string | null;
   pendingAlert: Emergency | null;
   rfidError: string | null;
   rfidBusy: boolean;
   lastUid: string | null;
-  loginError: string | null;
   busy: boolean;
   selected: Emergency | null;
-  login: (username: string, password: string) => Promise<void>;
-  logout: () => void;
   verifyRfid: (uid: string) => Promise<void>;
-  clearStaff: () => void;
+  lockDesk: () => void;
   selectCase: (id: string) => void;
   ackAlert: () => void;
   updateStatus: (status: EmergencyStatus) => Promise<void>;
@@ -50,18 +39,7 @@ interface ErContextValue {
 
 const ErContext = createContext<ErContextValue | null>(null);
 
-function readStoredSession(): DeskSession | null {
-  try {
-    const raw = sessionStorage.getItem(SESSION_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw) as DeskSession;
-  } catch {
-    return null;
-  }
-}
-
 export function ErProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<DeskSession | null>(readStoredSession);
   const [staff, setStaff] = useState<RfidVerifyResponse | null>(null);
   const [emergencies, setEmergencies] = useState<Emergency[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -69,7 +47,6 @@ export function ErProvider({ children }: { children: ReactNode }) {
   const [rfidError, setRfidError] = useState<string | null>(null);
   const [rfidBusy, setRfidBusy] = useState(false);
   const [lastUid, setLastUid] = useState<string | null>(null);
-  const [loginError, setLoginError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   const upsert = useCallback((incoming: Emergency) => {
@@ -82,7 +59,6 @@ export function ErProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!session) return;
     const unsubscribe = api.subscribe((event) => {
       upsert(event.payload);
       if (event.type === WS_EVENTS.EMERGENCY_CREATED) {
@@ -94,51 +70,21 @@ export function ErProvider({ children }: { children: ReactNode }) {
     void api.listEmergencies().then((list) => {
       setEmergencies(list);
     });
-    return unsubscribe;
-  }, [session, upsert]);
-
-  useEffect(() => {
-    if (!session) return;
     const timer = window.setTimeout(() => {
       void api.simulateAmbulanceReport();
     }, 2800);
-    return () => window.clearTimeout(timer);
-  }, [session]);
-
-  const login = useCallback(async (username: string, password: string) => {
-    setBusy(true);
-    setLoginError(null);
-    try {
-      await unlockAudio();
-      const next = await api.login({ username, password });
-      setSession(next);
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(next));
-    } catch (error) {
-      const message = error instanceof ApiError ? error.message : "Login failed";
-      setLoginError(message);
-      throw error;
-    } finally {
-      setBusy(false);
-    }
-  }, []);
-
-  const logout = useCallback(() => {
-    stopAlertSound();
-    setSession(null);
-    setStaff(null);
-    setEmergencies([]);
-    setSelectedId(null);
-    setPendingAlert(null);
-    setRfidError(null);
-    setLastUid(null);
-    sessionStorage.removeItem(SESSION_KEY);
-  }, []);
+    return () => {
+      unsubscribe();
+      window.clearTimeout(timer);
+    };
+  }, [upsert]);
 
   const verifyRfid = useCallback(async (uid: string) => {
     setLastUid(uid);
     setRfidBusy(true);
     setRfidError(null);
     try {
+      await unlockAudio();
       const next = await api.verifyRfid({ uid });
       setStaff(next);
     } catch (error) {
@@ -150,7 +96,8 @@ export function ErProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const clearStaff = useCallback(() => {
+  const lockDesk = useCallback(() => {
+    stopAlertSound();
     setStaff(null);
     setRfidError(null);
   }, []);
@@ -166,7 +113,7 @@ export function ErProvider({ children }: { children: ReactNode }) {
 
   const requireStaff = useCallback(() => {
     if (!staff) {
-      throw new ApiError(403, "Scan an RFID card to unlock clinical actions");
+      throw new ApiError(403, "Scan an RFID card to unlock the terminal");
     }
     return staff;
   }, [staff]);
@@ -213,21 +160,18 @@ export function ErProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<ErContextValue>(
     () => ({
-      session,
       staff,
+      locked: !staff,
       emergencies,
       selectedId,
       pendingAlert,
       rfidError,
       rfidBusy,
       lastUid,
-      loginError,
       busy,
       selected,
-      login,
-      logout,
       verifyRfid,
-      clearStaff,
+      lockDesk,
       selectCase,
       ackAlert,
       updateStatus,
@@ -235,7 +179,6 @@ export function ErProvider({ children }: { children: ReactNode }) {
       simulateIncoming,
     }),
     [
-      session,
       staff,
       emergencies,
       selectedId,
@@ -243,13 +186,10 @@ export function ErProvider({ children }: { children: ReactNode }) {
       rfidError,
       rfidBusy,
       lastUid,
-      loginError,
       busy,
       selected,
-      login,
-      logout,
       verifyRfid,
-      clearStaff,
+      lockDesk,
       selectCase,
       ackAlert,
       updateStatus,

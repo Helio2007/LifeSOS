@@ -20,17 +20,6 @@ export class ApiError extends Error {
   }
 }
 
-export interface LoginRequest {
-  username: string;
-  password: string;
-}
-
-export interface LoginResponse {
-  sessionToken: string;
-  displayName: string;
-  username: string;
-}
-
 type WsListener = (event: LifeSosWsEvent) => void;
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -47,8 +36,6 @@ const DEMO_CARDS: Record<string, Omit<RfidVerifyResponse, "token">> = {
     role: "NURSE",
   },
 };
-
-const DEMO_LOGIN = { username: "er.staff", password: "lifesos" };
 
 const CASE_TEMPLATES: Array<Omit<Emergency, "id" | "createdAt" | "updatedAt" | "notes">> = [
   {
@@ -113,21 +100,6 @@ class InProcessApi {
     this.listeners.add(listener);
     return () => {
       this.listeners.delete(listener);
-    };
-  }
-
-  async login(body: LoginRequest): Promise<LoginResponse> {
-    await wait(180);
-    if (
-      body.username !== DEMO_LOGIN.username ||
-      body.password !== DEMO_LOGIN.password
-    ) {
-      throw new ApiError(401, "Unknown staff login");
-    }
-    return {
-      sessionToken: "mock-session-er-staff",
-      displayName: "ER Desk",
-      username: body.username,
     };
   }
 

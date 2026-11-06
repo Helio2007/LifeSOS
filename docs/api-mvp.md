@@ -83,7 +83,7 @@ Success (`packages/contracts/json/rfid-verify-response.json`):
 }
 ```
 
-Unknown UID → `401` or `404` with no staff token. Desktop keeps clinical actions locked until a successful verify.
+Unknown UID → `401` or `404` with no staff token. The ER terminal uses this response as the **session**: identity, role, and token. There is no username/password path on the desk. Until a successful verify, the UI stays on a lock screen and must not show patient/case details (Flash Alert may only say that a case arrived).
 
 `role` values used in the prototype: `PHYSICIAN` | `NURSE` | `PARAMEDIC` | `ADMIN`.
 
@@ -93,8 +93,7 @@ The ER terminal ships with an in-process mock of the routes above plus:
 
 | Method | Path | Notes |
 | --- | --- | --- |
-| `POST` | `/api/auth/login` | Local session for the terminal (`er.staff` / `lifesos`). Not frozen; replace with Keidi’s JWT. |
-| `GET` | `/api/emergencies` | List open cases |
+| `GET` | `/api/emergencies` | List open cases (rendered only after RFID unlock) |
 | `PATCH` | `/api/emergencies/{id}/status` | Body `{ "status": "ARRIVED" }` |
 | `POST` | `/api/emergencies/{id}/notes` | Body `{ "text": "…" }` |
 

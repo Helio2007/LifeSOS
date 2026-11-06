@@ -1,8 +1,30 @@
 import { useEr } from "../state/ErSession";
+import { RfidCards } from "./RfidCards";
 
 export function FlashAlert() {
-  const { pendingAlert, ackAlert } = useEr();
+  const { pendingAlert, locked, ackAlert } = useEr();
   if (!pendingAlert) return null;
+
+  if (locked) {
+    return (
+      <div className="flash" role="alertdialog" aria-modal="true" aria-labelledby="flash-title">
+        <div className="flash__pulse" />
+        <div className="flash__card">
+          <p className="flash__kicker">Incoming emergency</p>
+          <h2 id="flash-title">
+            {pendingAlert.critical ? "Critical case arrived" : "New case arrived"}
+          </h2>
+          <p className="flash__meta">Scan your RFID card to view the patient.</p>
+          <div className="flash__unlock">
+            <RfidCards />
+          </div>
+          <button type="button" className="btn btn--alert" onClick={ackAlert}>
+            Silence alarm
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const { patient, vitals, ambulanceId, symptoms } = pendingAlert;
 
