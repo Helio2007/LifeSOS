@@ -1,0 +1,19 @@
+{
+  "name": "lifesos",
+  "private": true,
+  "version": "0.1.0",
+  "description": "LifeSOS — unified emergency response and hospital patient-flow management (school diploma prototype).",
+  "workspaces": [
+    "apps/desktop",
+    "packages/contracts"
+  ],
+  "scripts": {
+    "desktop": "npm run dev -w @lifesos/desktop",
+    "desktop:electron": "npm run electron -w @lifesos/desktop",
+    "desktop:build": "npm run build -w @lifesos/desktop",
+    "desktop:typecheck": "npm run typecheck -w @lifesos/desktop"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

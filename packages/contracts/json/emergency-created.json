@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifesos.local/contracts/emergency-created.json",
+  "title": "emergency.created",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "occurredAt", "payload"],
+  "properties": {
+    "type": { "const": "emergency.created" },
+    "occurredAt": { "type": "string", "format": "date-time" },
+    "payload": { "$ref": "./emergency.json" }
+  }
+}

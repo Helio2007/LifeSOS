@@ -1,0 +1,13 @@
+{
+  "name": "@lifesos/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MVP TypeScript types and JSON Schema for LifeSOS emergency, WebSocket, and RFID contracts.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./json/*": "./json/*"
+  }
+}
